@@ -1,7 +1,34 @@
+import { useRef } from "react";
 import { Link } from "react-router-dom";
+import axiosClient from "../axios-client";
+import { useStateContext } from "../contexts/ContextProvider";
 function Signup() {
+    const nameRef = useRef();
+    const emailRef = useRef();
+    const passwordRef = useRef();
+    const passwordConfirmationRef = useRef();
+    const { setToken, setUser } = useStateContext();
     const onSubmit = (e) => {
         e.preventDefault();
+        const payload = {
+            name: nameRef.current.value,
+            email: emailRef.current.value,
+            password: passwordRef.current.value,
+            password_confirmation: passwordConfirmationRef.current.value,
+        };
+        axiosClient
+            .post("/signup", payload)
+            .then(({ data }) => {
+                const { token, user } = data;
+                setToken(token);
+                setUser(user);
+            })
+            .catch((error) => {
+                const response = error.response;
+                if (response.status === 422) {
+                    console.log(response.data.errors);
+                }
+            });
     };
     return (
         <div className="login-signup-form animated fadeInDown">
@@ -9,21 +36,25 @@ function Signup() {
                 <form onSubmit={onSubmit}>
                     <h1 className="title">Create new account</h1>
                     <input
+                        ref={nameRef}
                         type="text"
                         placeholder="Enter your name"
                         name="name"
                     />
                     <input
+                        ref={emailRef}
                         type="email"
                         placeholder="Enter your email"
                         name="email"
                     />
                     <input
+                        ref={passwordRef}
                         type="password"
                         placeholder="Enter your password"
                         name="password"
                     />
                     <input
+                        ref={passwordConfirmationRef}
                         type="password"
                         placeholder="Confirm your password"
                         name="password_confirmation"

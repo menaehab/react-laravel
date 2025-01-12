@@ -29,7 +29,7 @@ class AuthController extends Controller
             $token = $user->createToken('main')->plainTextToken;
             return response(compact('user','token'),200);
         } else {
-            return response(['message' => 'Provided email address or password is incorrect'], 401);
+            return response(['message' => 'Provided email address or password is incorrect'], 422);
         }
     }
 

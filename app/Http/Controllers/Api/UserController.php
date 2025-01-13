@@ -15,8 +15,23 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::orderby('id', 'desc')->paginate(10);
-        return response()->json(UserResource::collection($users), 200);
+        $users = User::orderBy('id', 'desc')->paginate(10);
+
+        return response()->json([
+            'data' => UserResource::collection($users->items()),
+            'meta' => [
+                'current_page' => $users->currentPage(),
+                'last_page' => $users->lastPage(),
+                'per_page' => $users->perPage(),
+                'total' => $users->total(),
+            ],
+            'links' => [
+                'first' => $users->url(1),
+                'last' => $users->url($users->lastPage()),
+                'prev' => $users->previousPageUrl(),
+                'next' => $users->nextPageUrl(),
+            ],
+        ], 200);
     }
 
     /**

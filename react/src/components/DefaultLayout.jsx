@@ -2,8 +2,11 @@ import { Link, Navigate, Outlet } from "react-router-dom";
 import { useStateContext } from "../contexts/ContextProvider";
 import { useEffect } from "react";
 import axiosClient from "../axios-client";
+import { useNavigate } from "react-router-dom";
+
 function DefaultLayout() {
     const { user, token, setUser } = useStateContext();
+    const navigate = useNavigate();
     if (!token) {
         return <Navigate to="/login" />;
     }
@@ -12,7 +15,7 @@ function DefaultLayout() {
         axiosClient.post("/logout").then(() => {
             setUser({});
             localStorage.removeItem("token");
-            window.location.href = "/login";
+            navigate("/login");
         });
     };
     useEffect(() => {

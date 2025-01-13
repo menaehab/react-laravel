@@ -2,16 +2,20 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axiosClient from "../axios-client";
 import { useNavigate } from "react-router-dom";
+import { useStateContext } from "../contexts/ContextProvider";
+
 function UserForm() {
     const { id } = useParams();
     const [loading, setLoading] = useState(false);
     const [errors, setError] = useState([]);
+    const { setNotification } = useStateContext(); // Get setNotification function from context
     const [user, setUser] = useState({
         name: "",
         email: "",
         password: "",
         passwordConfirmation: "",
     });
+
     if (id) {
         useEffect(() => {
             setLoading(true);
@@ -25,23 +29,32 @@ function UserForm() {
                     setError(error);
                     setLoading(false);
                 });
-        }, []);
+        }, [id]);
     }
+
     const navigate = useNavigate();
+
     const onSubmit = (e) => {
         e.preventDefault();
         if (user.id) {
             axiosClient
                 .put("/users/" + user.id, user)
-                .then(() => navigate("/users"))
+                .then(() => {
+                    setNotification("User updated successfully"); // Set notification
+                    navigate("/users");
+                })
                 .catch((error) => setError(error.response.data.errors));
         } else {
             axiosClient
                 .post("/users", user)
-                .then(() => navigate("/users"))
+                .then(() => {
+                    setNotification("User created successfully"); // Set notification
+                    navigate("/users");
+                })
                 .catch((error) => setError(error.response.data.errors));
         }
     };
+
     return (
         <>
             {user.id && <h1>Update User: {user.name}</h1>}
